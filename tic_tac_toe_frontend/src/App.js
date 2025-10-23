@@ -25,10 +25,13 @@ function App() {
     const saved = localStorage.getItem(storageKeys.scores);
     return saved ? JSON.parse(saved) : { X: 0, O: 0, draws: 0 };
   });
-  // Theme state with persisted preference
+
+  // Theme state with persisted preference; auto-apply system pref on first load
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('ttt_theme');
-    return saved ? saved === 'dark' : false;
+    if (saved) return saved === 'dark';
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark;
   });
 
   // Persist to localStorage
@@ -48,6 +51,22 @@ function App() {
     document.body.setAttribute('data-theme', theme);
     localStorage.setItem('ttt_theme', theme);
   }, [isDark]);
+
+  // Listen to system preference changes, but only apply if user hasn't explicitly toggled
+  useEffect(() => {
+    const media = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+    if (!media) return;
+    const saved = localStorage.getItem('ttt_theme');
+    const handler = (e) => {
+      if (!saved) {
+        setIsDark(e.matches);
+      }
+    };
+    media.addEventListener ? media.addEventListener('change', handler) : media.addListener(handler);
+    return () => {
+      media.removeEventListener ? media.removeEventListener('change', handler) : media.removeListener(handler);
+    };
+  }, []);
 
   // Compute winner and winning line
   const result = useMemo(() => calculateWinner(squares), [squares]);
@@ -123,7 +142,12 @@ function App() {
   const toggleTheme = () => {
     /** Toggles light/dark theme and persists preference. */
     setIsDark(prev => !prev);
+    // Explicit user toggle should persist and override system until reset
+    const nextTheme = !isDark ? 'dark' : 'light';
+    localStorage.setItem('ttt_theme', nextTheme);
   };
+
+  const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   return (
     <div className="App">
@@ -133,7 +157,12 @@ function App() {
             <h1 className="title" aria-label="Game title">Throne Tic Tac Toe</h1>
             <p className="subtitle">Claim the board with House X or House O</p>
           </div>
-          <div aria-live="polite" aria-atomic="true" className="status" data-testid="status">
+          <div
+            aria-live={reducedMotion ? 'polite' : 'assertive'}
+            aria-atomic="true"
+            className="status"
+            data-testid="status"
+          >
             {winner ? <span className="win">Winner: {winner}</span> :
               isBoardFull(squares) ? <span className="draw">Draw!</span> :
                 <span>Next: <span className={xIsNext ? 'x' : 'o'}>{xIsNext ? 'X' : 'O'}</span></span>}
@@ -149,7 +178,6 @@ function App() {
 
           <section className="card" aria-labelledby="board-heading">
             <h2 id="board-heading" className="sr-only" style={{position:'absolute',left:'-9999px'}}>Game board</h2>
-            {/* Key on xIsNext to subtly re-trigger board's mount animation when starting new turns not desired; keep stable */}
             <Board
               squares={squares}
               onSquareClick={handleSquareClick}

@@ -11,6 +11,7 @@ function App() {
    * App is the main game container for Tic Tac Toe.
    * It manages the board state, turn, scores, persistence (localStorage),
    * accessibility live status, and integrates the Board, Scoreboard, and Controls.
+   * Also manages light/dark theme via data-theme on document.body.
    */
   const [squares, setSquares] = useState(() => {
     const saved = localStorage.getItem(storageKeys.squares);
@@ -24,6 +25,11 @@ function App() {
     const saved = localStorage.getItem(storageKeys.scores);
     return saved ? JSON.parse(saved) : { X: 0, O: 0, draws: 0 };
   });
+  // Theme state with persisted preference
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('ttt_theme');
+    return saved ? saved === 'dark' : false;
+  });
 
   // Persist to localStorage
   useEffect(() => {
@@ -35,6 +41,13 @@ function App() {
   useEffect(() => {
     localStorage.setItem(storageKeys.scores, JSON.stringify(scores));
   }, [scores]);
+
+  // Apply theme to body attribute
+  useEffect(() => {
+    const theme = isDark ? 'dark' : 'light';
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('ttt_theme', theme);
+  }, [isDark]);
 
   // Compute winner and winning line
   const result = useMemo(() => calculateWinner(squares), [squares]);
@@ -106,6 +119,12 @@ function App() {
     setXIsNext(prev => !prev);
   };
 
+  // PUBLIC_INTERFACE
+  const toggleTheme = () => {
+    /** Toggles light/dark theme and persists preference. */
+    setIsDark(prev => !prev);
+  };
+
   return (
     <div className="App">
       <main className="container">
@@ -130,6 +149,7 @@ function App() {
 
           <section className="card" aria-labelledby="board-heading">
             <h2 id="board-heading" className="sr-only" style={{position:'absolute',left:'-9999px'}}>Game board</h2>
+            {/* Key on xIsNext to subtly re-trigger board's mount animation when starting new turns not desired; keep stable */}
             <Board
               squares={squares}
               onSquareClick={handleSquareClick}
@@ -142,6 +162,8 @@ function App() {
                 onResetMatch={resetMatch}
                 onUndo={undo}
                 disabledUndo={!squares.some(Boolean) || winner}
+                isDark={isDark}
+                onToggleTheme={toggleTheme}
               />
             </div>
           </section>

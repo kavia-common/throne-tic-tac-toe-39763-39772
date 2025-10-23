@@ -26,6 +26,7 @@ export default function Square({ value, onClick, index, isWinning }) {
       onClick={onClick}
       onKeyDown={handleKeyDown}
       data-testid={`square-${index}`}
+      data-filled={value ? 'true' : 'false'}
     >
       {value === 'X' && <img src={gotX} alt="House X" />}
       {value === 'O' && <img src={gotO} alt="House O" />}

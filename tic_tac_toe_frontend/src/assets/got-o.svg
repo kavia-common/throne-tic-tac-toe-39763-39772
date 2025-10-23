@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GOT O">
+  <defs>
+    <filter id="shadow"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.25"/></filter>
+  </defs>
+  <rect width="256" height="256" fill="none"/>
+  <g filter="url(#shadow)" fill="none" stroke="#0f172a" stroke-width="22">
+    <circle cx="128" cy="128" r="78" />
+  </g>
+  <g fill="#F59E0B" opacity="0.14">
+    <path d="M128 32 l14 22 26 3 -18 18 4 25 -22-12 -22 12 4-25 -18-18 26-3z"/>
+  </g>
+</svg>

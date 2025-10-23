@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GOT X">
+  <defs>
+    <filter id="shadow"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.25"/></filter>
+  </defs>
+  <rect width="256" height="256" fill="none"/>
+  <g filter="url(#shadow)" stroke="#0f172a" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M48 48 L208 208" />
+    <path d="M208 48 L48 208" />
+  </g>
+  <g fill="#2563EB" opacity="0.12">
+    <path d="M128 24 l12 24 26 4 -19 18 5 26 -24-12 -24 12 5-26 -19-18 26-4z"/>
+  </g>
+</svg>
